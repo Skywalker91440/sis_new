@@ -1,0 +1,13 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% block page_title %}Add Subject to {{ student.username }}{% endblock %}
+{% block content %}
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3"><label>Select Subject</label><select name="subject" class="form-control" required>{% for s in subjects %}<option value="{{ s.id }}">{{ s.code }} - {{ s.name }}</option>{% endfor %}</select></div>
+        <div class="mb-3"><label>Grade (%)</label><input type="number" name="grade" class="form-control" placeholder="0-100" value="0"></div>
+        <button type="submit" class="btn btn-primary">Add Subject</button>
+        <a href="{% url 'admin_student_detail' student.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

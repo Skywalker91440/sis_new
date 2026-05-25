@@ -1,0 +1,12 @@
+{% extends 'admin_panel/base_admin.html' %}
+{% block page_title %}Add Grade for {{ enrollment.subject.code }}{% endblock %}
+{% block content %}
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3"><label>Grade (%) for {{ enrollment.student.user.username }}</label><input type="number" name="grade" class="form-control" placeholder="0-100" value="{{ enrollment.grade }}" required></div>
+        <button type="submit" class="btn btn-primary">Save Grade</button>
+        <a href="{% url 'admin_student_detail' enrollment.student.user.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

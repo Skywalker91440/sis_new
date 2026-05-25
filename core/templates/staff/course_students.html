@@ -1,0 +1,256 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}Students in {{ subject.code }}{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> Students Enrolled in {{ subject.code }} - {{ subject.name }}</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search student...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Email</th>
+                        <th>Current Grade</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for enrollment in students %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="student-id">{{ enrollment.student.student_id }}</td>
+                        <td class="student-name">{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</td>
+                        <td class="student-email">{{ enrollment.student.user.email }}</td>
+                        <td class="text-center">
+                            {% if enrollment.grade > 0 %}
+                                <span class="grade-badge">{{ enrollment.grade }}%</span>
+                            {% else %}
+                                <span class="grade-pending">Not Graded</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <span class="status-enrolled">{{ enrollment.status }}</span>
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'staff_edit_marks' subject.id %}" class="btn-edit">
+                                <i class="fas fa-edit"></i> Edit Marks
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <p>No students enrolled in this course</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+             </table
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'staff_my_courses' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to My Courses
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .student-email {
+        color: #7f8c8d;
+    }
+    
+    .grade-badge {
+        background: #27ae60;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .grade-pending {
+        color: #f39c12;
+        font-style: italic;
+    }
+    
+    .status-enrolled {
+        background: #d4edda;
+        color: #155724;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+    }
+    
+    .btn-edit {
+        display: inline-block;
+        padding: 6px 12px;
+        background: #27ae60;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 12px;
+        transition: all 0.3s;
+    }
+    
+    .btn-edit:hover {
+        background: #229954;
+        transform: scale(1.02);
+        color: white;
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#studentsTable tbody tr');
+        
+        rows.forEach(row => {
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            const id = row.cells[1]?.textContent.toLowerCase() || '';
+            const email = row.cells[3]?.textContent.toLowerCase() || '';
+            
+            if (name.includes(searchValue) || id.includes(searchValue) || email.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

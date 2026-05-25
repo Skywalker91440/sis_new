@@ -1,0 +1,230 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}Take Attendance - {{ subject.code }}{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-calendar-check"></i> Take Attendance - {{ subject.code }}: {{ subject.name }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="date-selector">
+                <label><i class="fas fa-calendar-alt"></i> Select Date:</label>
+                <input type="date" name="attendance_date" class="date-input" value="{{ today|date:'Y-m-d' }}" required>
+            </div>
+            
+            <div class="table-responsive mt-4">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Attendance Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in students %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="student-id">{{ enrollment.student.student_id }}</td>
+                            <td class="student-name">{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</td>
+                            <td>
+                                <select name="attendance_{{ enrollment.id }}" class="status-select">
+                                    <option value="present">Present</option>
+                                    <option value="absent" selected>Absent</option>
+                                    <option value="late">Late</option>
+                                </select>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                <div class="empty-state">
+                                    <i class="fas fa-users"></i>
+                                    <p>No students enrolled in this course</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                 </table>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save Attendance
+                </button>
+                <a href="{% url 'staff_my_courses' %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Courses
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .date-selector {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .date-selector label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .date-input {
+        padding: 8px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+    
+    .date-input:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .status-select {
+        padding: 8px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        cursor: pointer;
+        background: white;
+        width: 150px;
+    }
+    
+    .status-select:focus {
+        border-color: #3498db;
+        outline: none;
+    }
+    
+    .btn-save {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .date-selector {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .status-select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

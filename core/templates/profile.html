@@ -1,0 +1,274 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    {% if user.profile.profile_picture %}
+                        <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture">
+                    {% else %}
+                        <div class="avatar-placeholder">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                </div>
+                <h3>{{ user.get_full_name|default:user.username }}</h3>
+                <p class="text-muted">{{ user_type|title }}</p>
+                <p class="student-id">{{ student.student_id }}</p>
+            </div>
+            <div class="profile-info">
+                <div class="info-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>{{ user.email }}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-phone"></i>
+                    <span>{{ user.profile.phone|default:"Not provided" }}</span>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar"></i>
+                    <span>Joined: {{ user.date_joined|date:"F d, Y" }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-edit"></i> Edit Profile</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>First Name</label>
+                            <input type="text" name="first_name" class="form-control" value="{{ user.first_name }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Last Name</label>
+                            <input type="text" name="last_name" class="form-control" value="{{ user.last_name }}">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Email</label>
+                            <input type="email" name="email" class="form-control" value="{{ user.email }}">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Phone</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ user.profile.phone|default:'' }}">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Profile Picture</label>
+                            <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Update Profile
+                    </button>
+                    <a href="{% url 'dashboard' %}" class="btn-back">Back to Dashboard</a>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-graduation-cap"></i> Academic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="academic-info">
+                    <div class="info-row">
+                        <span class="info-label">Department:</span>
+                        <span class="info-value">{{ student.department }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Year of Study:</span>
+                        <span class="info-value">{{ student.year }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Enrolled Subjects:</span>
+                        <span class="info-value">{{ student.subjects.count }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .profile-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 30px 20px;
+        color: white;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 15px;
+    }
+    
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+    }
+    
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: rgba(255,255,255,0.3);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 48px;
+        font-weight: bold;
+        border: 3px solid white;
+    }
+    
+    .student-id {
+        background: rgba(255,255,255,0.2);
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-top: 10px;
+    }
+    
+    .profile-info {
+        padding: 20px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-item i {
+        width: 25px;
+        color: #3498db;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+    }
+    
+    .btn-save {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-right: 10px;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .academic-info {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+    }
+    
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-row:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .info-value {
+        color: #3498db;
+        font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+        .info-row {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+{% endblock %}

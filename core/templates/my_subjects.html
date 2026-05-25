@@ -1,0 +1,265 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Subjects{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-book"></i> My Subjects</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search subject...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="subjectsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Course Code</th>
+                        <th>Subject Name</th>
+                        <th>Instructor</th>
+                        <th>Schedule</th>
+                        <th>Credits</th>
+                        <th>My Marks</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ss in student_subjects %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="subject-code">{{ ss.subject.code }}</td>
+                        <td class="subject-name">{{ ss.subject.name }}</td>
+                        <td class="instructor">{{ ss.instructor_name|default:"Not Assigned" }}</td>
+                        <td class="schedule">{{ ss.subject.schedule|default:"TBA" }}</td>
+                        <td class="text-center">{{ ss.subject.credits }}</td>
+                        <td class="text-center">
+                            {% if ss.grade > 0 %}
+                                <span class="grade-badge">{{ ss.grade }}%</span>
+                            {% else %}
+                                <span class="grade-pending">Not Graded</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if ss.status == 'ENROLLED' %}
+                                <span class="status-enrolled"><i class="fas fa-check-circle"></i> Enrolled</span>
+                            {% else %}
+                                <span class="status-pending">{{ ss.status }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-book-open"></i>
+                                <p>No subjects enrolled yet</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .subject-code {
+        font-weight: 700;
+        color: #3498db;
+    }
+    
+    .subject-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .instructor {
+        color: #7f8c8d;
+    }
+    
+    .schedule {
+        color: #27ae60;
+        font-weight: 500;
+    }
+    
+    .grade-badge {
+        background: #27ae60;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .grade-pending {
+        color: #f39c12;
+        font-size: 12px;
+        font-style: italic;
+    }
+    
+    .status-enrolled {
+        color: #27ae60;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    
+    .status-enrolled i {
+        margin-right: 3px;
+    }
+    
+    .status-pending {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 12px;
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .empty-state p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#subjectsTable tbody tr');
+        
+        rows.forEach(row => {
+            const code = row.cells[1]?.textContent.toLowerCase() || '';
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            const instructor = row.cells[3]?.textContent.toLowerCase() || '';
+            
+            if (code.includes(searchValue) || name.includes(searchValue) || instructor.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,312 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Manage Events{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Event Form - Left Side -->
+    <div class="col-md-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <h5><i class="fas fa-calendar-plus"></i> Add New Event</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-heading"></i> Event Title</label>
+                        <input type="text" name="title" class="form-control" placeholder="Enter event title" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-calendar-alt"></i> Event Date</label>
+                        <input type="date" name="date" class="form-control" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-location-dot"></i> Location</label>
+                        <input type="text" name="location" class="form-control" placeholder="Event location">
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-align-left"></i> Description</label>
+                        <textarea name="description" class="form-control" rows="4" placeholder="Event description..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-save"></i> Add Event
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Events List - Right Side -->
+    <div class="col-md-7">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> All Events</h5>
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search event...">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table" id="eventsTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Event Title</th>
+                                <th>Date</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for event in events %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="event-title">{{ event.title }}</td>
+                                <td class="event-date">{{ event.date|date:"M d, Y" }}</td>
+                                <td>{{ event.location|default:"-" }}</td>
+                                <td class="text-center">
+                                    <button class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ event.id }}">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                             </tr>
+                             
+                             <!-- Delete Modal -->
+                             <div class="modal fade" id="deleteModal{{ event.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post" action="{% url 'admin_events' %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="event_id" value="{{ event.id }}">
+                                            <div class="modal-header">
+                                                <h5>Delete Event - {{ event.title }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete <strong>{{ event.title }}</strong>?</p>
+                                                <p class="text-danger">This action cannot be undone!</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                             </div>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">
+                                    <div class="empty-state">
+                                        <i class="fas fa-calendar-times"></i>
+                                        <p>No events found</p>
+                                    </div>
+                                </td>
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-card, .table-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        font-size: 18px;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 13px;
+    }
+    
+    .form-group label i {
+        margin-right: 8px;
+        color: #3498db;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+    }
+    
+    textarea.form-control {
+        resize: vertical;
+    }
+    
+    .btn-add {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .search-box .form-control:focus {
+        background: white;
+        color: #2c3e50;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .event-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .event-date {
+        color: #27ae60;
+        font-weight: 500;
+    }
+    
+    .btn-delete {
+        display: inline-block;
+        padding: 5px 12px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-delete:hover {
+        background: #c0392b;
+        transform: scale(1.02);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .empty-state p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .search-box {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#eventsTable tbody tr');
+        rows.forEach(row => {
+            const title = row.cells[1]?.textContent.toLowerCase() || '';
+            const location = row.cells[3]?.textContent.toLowerCase() || '';
+            row.style.display = (title.includes(searchValue) || location.includes(searchValue)) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}

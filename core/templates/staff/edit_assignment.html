@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Assignment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h5>Edit Assignment</h5>
+                <a href="{% url 'staff_assignments' %}" class="btn btn-sm btn-light float-end">Back to Assignments</a>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label>Course</label>
+                        <select name="subject" class="form-control" disabled>
+                            <option value="{{ assignment.subject.id }}">{{ assignment.subject.code }} - {{ assignment.subject.name }}</option>
+                        </select>
+                        <small class="text-muted">Course cannot be changed</small>
+                    </div>
+                    <div class="mb-3">
+                        <label>Assignment Title</label>
+                        <input type="text" name="title" class="form-control" value="{{ assignment.title }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Due Date</label>
+                        <input type="date" name="due_date" class="form-control" value="{{ assignment.due_date|date:'Y-m-d' }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Total Marks</label>
+                        <input type="number" name="total_marks" class="form-control" value="{{ assignment.total_marks }}" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Assignment</button>
+                    <a href="{% url 'staff_assignments' %}" class="btn btn-secondary">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

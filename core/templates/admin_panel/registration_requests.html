@@ -1,0 +1,497 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Registration Requests{% endblock %}
+
+{% block content %}
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stat-card pending">
+            <div class="stat-icon"></div>
+            <div class="stat-value">{{ pending_count }}</div>
+            <div class="stat-label">Pending Requests</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card approved">
+            <div class="stat-icon"></div>
+            <div class="stat-value">{{ approved_count }}</div>
+            <div class="stat-label">Approved</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stat-card rejected">
+            <div class="stat-icon"></div>
+            <div class="stat-value">{{ rejected_count }}</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-user-plus"></i> Student Registration Requests</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search by name or email...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="requestsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Course</th>
+                        <th>Year</th>
+                        <th>Submitted</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in requests %}
+                    <tr class="request-row" data-id="{{ request.id }}">
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="student-name">{{ request.first_name }} {{ request.last_name }}</td>
+                        <td class="student-email">{{ request.email }}</td>
+                        <td>{{ request.course }}</td>
+                        <td class="text-center">{{ request.year }}</td>
+                        <td class="submitted-date">{{ request.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td class="text-center">
+                            {% if request.status == 'pending' %}
+                                <span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                            {% elif request.status == 'approved' %}
+                                <span class="badge-approved"><i class="fas fa-check-circle"></i> Approved</span>
+                            {% else %}
+                                <span class="badge-rejected"><i class="fas fa-times-circle"></i> Rejected</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <button class="btn-view" data-bs-toggle="modal" data-bs-target="#viewModal{{ request.id }}">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            {% if request.status == 'pending' %}
+                                <button class="btn-accept" data-bs-toggle="modal" data-bs-target="#acceptModal{{ request.id }}">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                                <button class="btn-decline" data-bs-toggle="modal" data-bs-target="#declineModal{{ request.id }}">
+                                    <i class="fas fa-times"></i> Decline
+                                </button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    
+                    <!-- View Modal -->
+                    <div class="modal fade" id="viewModal{{ request.id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title">Registration Details - {{ request.first_name }} {{ request.last_name }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="detail-section">
+                                        <h6><i class="fas fa-user-circle"></i> Personal Information</h6>
+                                        <div class="detail-grid">
+                                            <div class="detail-item"><span class="detail-label">Full Name:</span><span class="detail-value">{{ request.first_name }} {{ request.last_name }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">Email:</span><span class="detail-value">{{ request.email }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">Phone:</span><span class="detail-value">{{ request.phone|default:"-" }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">Date of Birth:</span><span class="detail-value">{{ request.date_of_birth|default:"-" }}</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h6><i class="fas fa-graduation-cap"></i> Academic Information</h6>
+                                        <div class="detail-grid">
+                                            <div class="detail-item"><span class="detail-label">Course:</span><span class="detail-value">{{ request.course }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">Year:</span><span class="detail-value">{{ request.year }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">Previous Institution:</span><span class="detail-value">{{ request.previous_institution|default:"-" }}</span></div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <h6><i class="fas fa-map-marker-alt"></i> Address Information</h6>
+                                        <div class="detail-grid">
+                                            <div class="detail-item"><span class="detail-label">Address:</span><span class="detail-value">{{ request.address|default:"-" }}</span></div>
+                                            <div class="detail-item"><span class="detail-label">City:</span><span class="detail-value">{{ request.city|default:"-" }}</span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Accept Modal -->
+                    <div class="modal fade" id="acceptModal{{ request.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'admin_process_registration' request.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="accept">
+                                    <div class="modal-header bg-success text-white">
+                                        <h5 class="modal-title">Accept Registration</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to accept <strong>{{ request.first_name }} {{ request.last_name }}</strong>'s registration?</p>
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i> This will:
+                                            <ul class="mt-2 mb-0">
+                                                <li>Create a student account</li>
+                                                <li>Generate Student ID and Password</li>
+                                                <li>Send credentials to {{ request.email }}</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-success">Yes, Accept</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Decline Modal -->
+                    <div class="modal fade" id="declineModal{{ request.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'admin_process_registration' request.id %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="decline">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title">Decline Registration</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to decline <strong>{{ request.first_name }} {{ request.last_name }}</strong>'s registration?</p>
+                                        <div class="form-group mb-3">
+                                            <label>Reason (optional):</label>
+                                            <textarea name="admin_notes" class="form-control" rows="3" placeholder="Enter reason for rejection..."></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-danger">Yes, Decline</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No registration requests found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Statistics Cards */
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 10px 0;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+    
+    .stat-card.pending .stat-value { color: #f39c12; }
+    .stat-card.approved .stat-value { color: #27ae60; }
+    .stat-card.rejected .stat-value { color: #e74c3c; }
+    
+    /* Card */
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    /* Search Box */
+    .search-box {
+        width: 280px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .search-box .form-control:focus {
+        background: white;
+        color: #2c3e50;
+    }
+    
+    /* Data Table */
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 13px;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .student-email {
+        color: #3498db;
+    }
+    
+    .submitted-date {
+        font-size: 12px;
+        color: #7f8c8d;
+    }
+    
+    /* Badges */
+    .badge-pending, .badge-approved, .badge-rejected {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+    
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-approved {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    /* Buttons */
+    .btn-view, .btn-accept, .btn-decline {
+        display: inline-block;
+        padding: 5px 12px;
+        margin: 2px;
+        border-radius: 5px;
+        font-size: 11px;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-view {
+        background: #3498db;
+        color: white;
+    }
+    
+    .btn-view:hover {
+        background: #2980b9;
+        transform: scale(1.02);
+    }
+    
+    .btn-accept {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .btn-accept:hover {
+        background: #229954;
+        transform: scale(1.02);
+    }
+    
+    .btn-decline {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    .btn-decline:hover {
+        background: #c0392b;
+        transform: scale(1.02);
+    }
+    
+    /* Modal Details */
+    .detail-section {
+        margin-bottom: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 10px;
+    }
+    
+    .detail-section h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .detail-section h6 i {
+        margin-right: 8px;
+        color: #3498db;
+    }
+    
+    .detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+    
+    .detail-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .detail-value {
+        color: #666;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .empty-state p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .detail-grid {
+            grid-template-columns: 1fr;
+        }
+        .detail-item {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#requestsTable tbody tr');
+        
+        rows.forEach(row => {
+            const name = row.cells[1]?.textContent.toLowerCase() || '';
+            const email = row.cells[2]?.textContent.toLowerCase() || '';
+            
+            if (name.includes(searchValue) || email.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

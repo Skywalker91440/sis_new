@@ -1,0 +1,273 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Manage Students{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-users"></i> All Students</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search student...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="studentsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Year</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="student-id">{{ student.student_id }}</td>
+                        <td class="student-name">{{ student.full_name }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.department }}</td>
+                        <td>{{ student.year }}</td>
+                        <td class="text-center">
+                            <a href="{% url 'admin_student_detail' student.id %}" class="btn-view">
+                                <i class="fas fa-eye"></i> View
+                            </a>
+                            <button class="btn-reset" data-bs-toggle="modal" data-bs-target="#resetModal{{ student.id }}">
+                                <i class="fas fa-key"></i> Reset
+                            </button>
+                            <button class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ student.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </td>
+                     </tr>
+                     
+                     <!-- Reset Password Modal -->
+                     <div class="modal fade" id="resetModal{{ student.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                    <input type="hidden" name="action" value="reset_password">
+                                    <div class="modal-header">
+                                        <h5>Reset Password - {{ student.username }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <label>New Password (leave empty for auto-generate)</label>
+                                        <input type="text" name="new_password" class="form-control">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-warning">Reset Password</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                     </div>
+                     
+                     <!-- Delete Modal -->
+                     <div class="modal fade" id="deleteModal{{ student.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="student_id" value="{{ student.id }}">
+                                    <input type="hidden" name="action" value="delete">
+                                    <div class="modal-header">
+                                        <h5>Delete Student - {{ student.username }}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete <strong>{{ student.full_name }}</strong>?</p>
+                                        <p class="text-danger">This action cannot be undone!</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                     </div>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-users"></i>
+                                <p>No students found</p>
+                            </div>
+                        </td>
+                     </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .btn-view, .btn-reset, .btn-delete {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 2px;
+        border-radius: 5px;
+        font-size: 11px;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-view {
+        background: #3498db;
+        color: white;
+    }
+    
+    .btn-reset {
+        background: #f39c12;
+        color: white;
+    }
+    
+    .btn-delete {
+        background: #e74c3c;
+        color: white;
+    }
+    
+    .btn-view:hover, .btn-reset:hover, .btn-delete:hover {
+        transform: scale(1.02);
+        opacity: 0.9;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#studentsTable tbody tr');
+        
+        rows.forEach(row => {
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            const id = row.cells[1]?.textContent.toLowerCase() || '';
+            const email = row.cells[3]?.textContent.toLowerCase() || '';
+            
+            if (name.includes(searchValue) || id.includes(searchValue) || email.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

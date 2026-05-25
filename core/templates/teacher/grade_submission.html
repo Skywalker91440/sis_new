@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Grade Submission{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-success text-white">
+        <h4>Grade Assignment Submission</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>Student:</strong> {{ submission.student.user_profile.user.get_full_name }}</p>
+        <p><strong>Assignment:</strong> {{ submission.assignment.title }}</p>
+        <p><strong>Subject:</strong> {{ submission.assignment.subject.code }} - {{ submission.assignment.subject.name }}</p>
+        <p><strong>Submitted:</strong> {{ submission.submitted_date|date:"Y-m-d H:i" }}</p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label>Score (out of {{ submission.assignment.max_score }})</label>
+                <input type="number" name="score" class="form-control" step="0.01" min="0" max="{{ submission.assignment.max_score }}" required>
+            </div>
+            <div class="mb-3">
+                <label>Feedback</label>
+                <textarea name="feedback" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Grade</button>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

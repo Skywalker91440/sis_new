@@ -1,0 +1,86 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Add New Student{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 700px; margin: 0 auto;">
+    <div class="card-header bg-success text-white">
+        <h5><i class="fas fa-user-plus"></i> Add New Student</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Username *</label>
+                    <input type="text" name="username" class="form-control" required placeholder="Enter username">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Email *</label>
+                    <input type="email" name="email" class="form-control" required placeholder="student@example.com">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" class="form-control" placeholder="First name">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" class="form-control" placeholder="Last name">
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Phone Number</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="Phone number">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Department</label>
+                    <select name="department" class="form-control" required>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Business">Business</option>
+                        <option value="Mathematics">Mathematics</option>
+                        <option value="Science">Science</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label>Year of Study</label>
+                    <select name="year" class="form-control" required>
+                        <option value="1st Year">1st Year</option>
+                        <option value="2nd Year">2nd Year</option>
+                        <option value="3rd Year">3rd Year</option>
+                        <option value="4th Year">4th Year</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label>Password</label>
+                    <input type="text" name="password" class="form-control" value="student123" required>
+                    <small class="text-muted">Default: student123</small>
+                </div>
+            </div>
+            
+            <div class="alert alert-info mt-2">
+                <i class="fas fa-info-circle"></i> Student ID will be generated automatically: <strong>SIS2026xxxxx</strong>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">
+                    <i class="fas fa-save"></i> Add Student
+                </button>
+                <a href="{% url 'admin_students' %}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

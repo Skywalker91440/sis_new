@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Enter Grades - {{ subject.code }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-star"></i> Enter Grades for {{ subject.code }} - {{ subject.name }}</h5>
+        <a href="{% url 'staff_course_students' subject.id %}" class="btn btn-sm btn-secondary">← Back</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Current Grade</th>
+                            <th>New Grade (%)</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in students %}
+                        <tr>
+                            <td>{{ enrollment.student.student_id }}</td>
+                            <td>{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</td>
+                            <td>{{ enrollment.grade }}%</td>
+                            <td>
+                                <input type="number" name="grade_{{ enrollment.id }}" value="{{ enrollment.grade }}" 
+                                       class="form-control" style="width: 100px;" min="0" max="100">
+                             </td>
+                            <td><span class="badge badge-success">{{ enrollment.status }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Save All Grades</button>
+            <a href="{% url 'staff_course_students' subject.id %}" class="btn btn-secondary mt-3">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,379 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Assignments{% endblock %}
+
+{% block dashboard_content %}
+<!-- Statistics Cards -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icon"></div>
+        <div class="stat-value">{{ total_assignments }}</div>
+        <div class="stat-label">Total Assignments</div>
+    </div>
+    <div class="stat-card pending">
+        <div class="stat-icon"></div>
+        <div class="stat-value">{{ pending_count }}</div>
+        <div class="stat-label">Pending Submission</div>
+    </div>
+    <div class="stat-card submitted">
+        <div class="stat-icon"></div>
+        <div class="stat-value">{{ submitted_count }}</div>
+        <div class="stat-label">Submitted</div>
+    </div>
+    <div class="stat-card graded">
+        <div class="stat-icon"></div>
+        <div class="stat-value">{{ graded_count }}</div>
+        <div class="stat-label">Graded</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-tasks"></i> My Assignments</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search assignment...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="tasksTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Course</th>
+                        <th>Assignment Title</th>
+                        <th>Due Date</th>
+                        <th>Total Marks</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sa in student_assignments %}
+                    <tr class="assignment-row">
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td>
+                            <strong>{{ sa.assignment.subject.code }}</strong><br>
+                            <small class="text-muted">{{ sa.assignment.subject.name }}</small>
+                        </td>
+                        <td class="assignment-title">{{ sa.assignment.title }}</td>
+                        <td class="due-date {% if sa.assignment.due_date|date:'Y-m-d' < today|date:'Y-m-d' and sa.status == 'Pending' %}overdue{% elif sa.assignment.due_date|date:'Y-m-d' == today|date:'Y-m-d' %}due-today{% endif %}">
+                            {% if sa.assignment.due_date|date:"Y-m-d" < today|date:"Y-m-d" and sa.status == 'Pending' %}
+                                <span class="badge-overdue">Overdue!</span><br>
+                                <small>{{ sa.assignment.due_date|date:"M d, Y" }}</small>
+                            {% elif sa.assignment.due_date|date:"Y-m-d" == today|date:"Y-m-d" %}
+                                <span class="badge-duetoday">Due Today!</span><br>
+                                <small>{{ sa.assignment.due_date|date:"M d, Y" }}</small>
+                            {% else %}
+                                <small>{{ sa.assignment.due_date|date:"M d, Y" }}</small>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ sa.assignment.total_marks }}</td>
+                        <td class="text-center">
+                            {% if sa.status == 'Pending' %}
+                                <span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                            {% elif sa.status == 'Submitted' %}
+                                <span class="badge-submitted"><i class="fas fa-paper-plane"></i> Submitted</span>
+                            {% else %}
+                                <span class="badge-graded"><i class="fas fa-check-circle"></i> Graded</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if sa.status == 'Pending' %}
+                                <a href="{% url 'submit_assignment' sa.assignment.id %}" class="btn-submit">
+                                    <i class="fas fa-upload"></i> Submit
+                                </a>
+                            {% elif sa.status == 'Submitted' %}
+                                <a href="{% url 'submit_assignment' sa.assignment.id %}" class="btn-edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                            {% else %}
+                                <button class="btn-completed" disabled>✓ Completed</button>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No assignments assigned yet</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+             </table
+        </div>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'dashboard' %}" class="btn-back">← Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 15px;
+        text-align: center;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .stat-icon {
+        font-size: 35px;
+        margin-bottom: 10px;
+    }
+    
+    .stat-value {
+        font-size: 32px;
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .stat-label {
+        color: #7f8c8d;
+        font-size: 13px;
+    }
+    
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .card-footer {
+        padding: 15px 20px;
+        border-top: 1px solid #e0e0e0;
+        background: #f8f9fa;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .assignment-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .due-date {
+        text-align: center;
+    }
+    
+    .due-date.overdue {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+    
+    .due-date.due-today {
+        color: #f39c12;
+        font-weight: bold;
+    }
+    
+    .badge-overdue, .badge-duetoday, .badge-pending, .badge-submitted, .badge-graded {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+    }
+    
+    .badge-overdue {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .badge-duetoday {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-submitted {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+    
+    .badge-graded {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .btn-submit, .btn-edit, .btn-completed {
+        display: inline-block;
+        padding: 5px 12px;
+        border-radius: 5px;
+        font-size: 11px;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+    
+    .btn-submit {
+        background: #27ae60;
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        background: #229954;
+        transform: scale(1.02);
+        color: white;
+    }
+    
+    .btn-edit {
+        background: #3498db;
+        color: white;
+    }
+    
+    .btn-edit:hover {
+        background: #2980b9;
+        transform: scale(1.02);
+        color: white;
+    }
+    
+    .btn-completed {
+        background: #95a5a6;
+        color: white;
+        cursor: not-allowed;
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 8px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    .text-muted {
+        color: #95a5a6;
+        font-size: 11px;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-row {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#tasksTable tbody tr');
+        
+        rows.forEach(row => {
+            const title = row.cells[2]?.textContent.toLowerCase() || '';
+            const course = row.cells[1]?.textContent.toLowerCase() || '';
+            
+            if (title.includes(searchValue) || course.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

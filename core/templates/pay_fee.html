@@ -1,0 +1,170 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Pay Fee - {{ fee.fee_type }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header bg-success text-white">
+        <h5><i class="fas fa-credit-card"></i> Make Payment</h5>
+    </div>
+    <div class="card-body">
+        <div class="fee-details">
+            <h6>Fee Details</h6>
+            <div class="detail-row">
+                <span class="detail-label">Fee Type:</span>
+                <span class="detail-value">{{ fee.fee_type }}</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Amount:</span>
+                <span class="detail-value">TZS {{ fee.amount|floatformat:0 }}/=</span>
+            </div>
+            <div class="detail-row">
+                <span class="detail-label">Due Date:</span>
+                <span class="detail-value">{{ fee.due_date|date:"F d, Y" }}</span>
+            </div>
+        </div>
+        
+        <hr>
+        
+        <div class="payment-instructions">
+            <h6>Payment Instructions</h6>
+            <div class="alert alert-info">
+                <strong>Bank Details:</strong><br>
+                Bank Name: CRDB Bank<br>
+                Account Name: SIS Tanzania<br>
+                Account Number: 0150234567800<br>
+                Branch: Dar es Salaam<br>
+                <hr>
+                <strong>Mobile Payment:</strong><br>
+                M-Pesa: 0712345678 (Name: SIS Tanzania)<br>
+                Tigo Pesa: 0712345678<br>
+                Airtel Money: 0712345678
+            </div>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                <label>Payment Reference Number</label>
+                <input type="text" name="reference_number" class="form-control" placeholder="e.g., TRX123456789" required>
+                <small class="text-muted">Enter the transaction/reference number from your payment</small>
+            </div>
+            
+            <div class="mb-3">
+                <label>Upload Payment Receipt/Proof</label>
+                <input type="file" name="receipt" class="form-control" accept="image/*,.pdf" required>
+                <small class="text-muted">Upload screenshot or PDF of payment confirmation</small>
+            </div>
+            
+            <div class="mb-3">
+                <label>Additional Notes (Optional)</label>
+                <textarea name="notes" class="form-control" rows="3" placeholder="Any additional information about your payment..."></textarea>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Submit Payment
+                </button>
+                <a href="{% url 'my_fee' %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .fee-details {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .fee-details h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .detail-label {
+        font-weight: bold;
+        color: #2c3e50;
+    }
+    
+    .detail-value {
+        color: #27ae60;
+        font-weight: bold;
+    }
+    
+    .payment-instructions h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #27ae60;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39,174,96,0.1);
+    }
+    
+    .btn-submit {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+        font-weight: 500;
+    }
+    
+    .btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        color: white;
+    }
+    
+    .alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        border-radius: 10px;
+    }
+</style>
+{% endblock %}

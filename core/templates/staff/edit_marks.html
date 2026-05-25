@@ -1,0 +1,254 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}Edit Marks - {{ subject.code }}{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-star"></i> Edit Marks - {{ subject.code }}: {{ subject.name }}</h5>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Current Marks</th>
+                            <th>New Marks (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for enrollment in students %}
+                        <tr>
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td class="student-id">{{ enrollment.student.student_id }}</td>
+                            <td class="student-name">{{ enrollment.student.user.get_full_name|default:enrollment.student.user.username }}</td>
+                            <td class="text-center">
+                                {% if enrollment.grade > 0 %}
+                                    <span class="current-grade">{{ enrollment.grade }}%</span>
+                                {% else %}
+                                    <span class="no-grade">Not Graded</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-center">
+                                <input type="number" name="mark_{{ enrollment.id }}" 
+                                       value="{{ enrollment.grade }}" 
+                                       class="grade-input" 
+                                       min="0" max="100" step="1">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn-save">
+                    <i class="fas fa-save"></i> Save All Marks
+                </button>
+                <a href="{% url 'staff_course_students' subject.id %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Grading Scale -->
+<div class="grading-card">
+    <div class="grading-header">
+        <h5><i class="fas fa-chart-line"></i> Grading Scale</h5>
+    </div>
+    <div class="grading-body">
+        <div class="grade-items">
+            <div class="grade-item grade-a">80-100% - A (Excellent)</div>
+            <div class="grade-item grade-b">70-79% - B (Very Good)</div>
+            <div class="grade-item grade-c">60-69% - C (Good)</div>
+            <div class="grade-item grade-d">50-59% - D (Pass)</div>
+            <div class="grade-item grade-f">0-49% - F (Fail)</div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .current-grade {
+        background: #27ae60;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        display: inline-block;
+    }
+    
+    .no-grade {
+        color: #f39c12;
+        font-style: italic;
+    }
+    
+    .grade-input {
+        width: 100px;
+        padding: 8px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        text-align: center;
+        transition: all 0.3s;
+    }
+    
+    .grade-input:focus {
+        border-color: #27ae60;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39,174,96,0.1);
+    }
+    
+    .btn-save {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+    
+    .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .grading-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .grading-header {
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        padding: 15px 20px;
+    }
+    
+    .grading-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .grading-body {
+        padding: 20px;
+    }
+    
+    .grade-items {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+    }
+    
+    .grade-item {
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 13px;
+    }
+    
+    .grade-a { background: #d4edda; color: #155724; }
+    .grade-b { background: #d1ecf1; color: #0c5460; }
+    .grade-c { background: #fff3cd; color: #856404; }
+    .grade-d { background: #f8d7da; color: #721c24; }
+    .grade-f { background: #f8d7da; color: #721c24; }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .grade-input {
+            width: 70px;
+        }
+        .grade-items {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

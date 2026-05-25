@@ -1,0 +1,88 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}Submit Assignment{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5><i class="fas fa-upload"></i> Submit Assignment</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-box">
+                    <h6>Assignment Details</h6>
+                    <p><strong>Course:</strong> {{ assignment.subject.code }} - {{ assignment.subject.name }}</p>
+                    <p><strong>Title:</strong> {{ assignment.title }}</p>
+                    <p><strong>Due Date:</strong> {{ assignment.due_date|date:"F d, Y" }}</p>
+                    <p><strong>Total Marks:</strong> {{ assignment.total_marks }}</p>
+                    <p><strong>Description:</strong> {{ assignment.description|default:"No description" }}</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-box">
+                    <h6>Your Submission</h6>
+                    {% if submission.status == 'Submitted' %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-check-circle"></i> Already submitted on {{ submission.submitted_at|date:"F d, Y H:i" }}
+                        </div>
+                    {% endif %}
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label>Upload File (PDF, DOC, DOCX, ZIP)</label>
+                            <input type="file" name="submission_file" class="form-control" accept=".pdf,.doc,.docx,.zip">
+                            {% if submission.file %}
+                                <small class="text-muted">Current file: <a href="{{ submission.file.url }}" target="_blank">{{ submission.file.name }}</a></small>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label>Or Write Your Answer</label>
+                            <textarea name="submission_text" class="form-control" rows="6" placeholder="Write your answer here...">{{ submission.submission_text }}</textarea>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-paper-plane"></i> Submit Assignment
+                            </button>
+                            <a href="{% url 'my_tasks' %}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .info-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .info-box h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .info-box p {
+        margin-bottom: 10px;
+    }
+    
+    .alert-info {
+        background: #d1ecf1;
+        color: #0c5460;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+    }
+</style>
+{% endblock %}

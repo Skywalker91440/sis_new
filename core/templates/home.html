@@ -1,0 +1,137 @@
+{% extends 'base_auth.html' %}
+{% load static %}
+
+{% block title %}Home - SIS Tanzania{% endblock %}
+
+{% block content %}
+<div class="home-card">
+    <div class="hero-section">
+        <div class="hero-icon">🎓</div>
+        <h1>Student Management System</h1>
+        <p class="description">Your complete solution for managing academic life</p>
+    </div>
+    
+    <div class="button-group">
+        <a href="{% url 'login' %}" class="btn btn-login">
+            <span class="btn-icon"></span> Student Login
+        </a>
+        <a href="{% url 'register' %}" class="btn btn-register">
+            <span class="btn-icon"></span> Register here
+        </a>
+        <a href="{% url 'admin_login' %}" class="btn btn-admin">
+            <span class="btn-icon"></span> Admin Panel
+        </a>
+    </div>
+</div>
+
+<style>
+    body {
+        background: url("{% static 'images/image1.jpg' %}");
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+    
+    .home-card {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 30px;
+        padding: 50px 40px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+        text-align: center;
+        animation: fadeInUp 0.6s ease;
+    }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .hero-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+    }
+    
+    h1 {
+        color: #2c3e50;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+    
+    .description {
+        color: #7f8c8d;
+        margin-bottom: 40px;
+        font-size: 14px;
+    }
+    
+    .button-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 30px;
+        border-radius: 50px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102,126,234,0.4);
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        color: white;
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(39,174,96,0.4);
+    }
+    
+    .btn-admin {
+        background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+        color: white;
+        box-shadow: 0 5px 15px rgba(231,76,60,0.3);
+    }
+    
+    .btn-admin:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(231,76,60,0.4);
+    }
+    
+    @media (max-width: 600px) {
+        .home-card {
+            padding: 30px 20px;
+        }
+        .button-group {
+            flex-direction: column;
+        }
+        h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+{% endblock %}

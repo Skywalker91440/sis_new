@@ -1,0 +1,276 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}Grade Submission{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header bg-success">
+        <h5><i class="fas fa-star"></i> Grade Assignment Submission</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="info-section">
+                    <h6>Student Information</h6>
+                    <div class="info-item">
+                        <span class="info-label">Student Name:</span>
+                        <span class="info-value">{{ submission.student.user.get_full_name|default:submission.student.user.username }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Student ID:</span>
+                        <span class="info-value">{{ submission.student.student_id }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value">{{ submission.student.user.email }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="info-section">
+                    <h6>Assignment Information</h6>
+                    <div class="info-item">
+                        <span class="info-label">Course:</span>
+                        <span class="info-value">{{ submission.assignment.subject.code }} - {{ submission.assignment.subject.name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Assignment:</span>
+                        <span class="info-value">{{ submission.assignment.title }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Submitted:</span>
+                        <span class="info-value">{{ submission.submitted_at|date:"F d, Y H:i" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="submission-section">
+            <h6><i class="fas fa-file-alt"></i> Submitted Work</h6>
+            <div class="submission-content">
+                {% if submission.file %}
+                    <p><strong>File:</strong> <a href="{{ submission.file.url }}" class="btn-download" target="_blank">Download File</a></p>
+                {% endif %}
+                {% if submission.image %}
+                    <p><strong>Image:</strong> <a href="{{ submission.image.url }}" class="btn-download" target="_blank">View Image</a></p>
+                    <img src="{{ submission.image.url }}" style="max-width: 100%; max-height: 200px; margin-top: 10px; border-radius: 8px;">
+                {% endif %}
+                {% if submission.submission_text %}
+                    <p><strong>Submission Text:</strong></p>
+                    <div class="submission-text">{{ submission.submission_text|linebreaks }}</div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <form method="post" class="grade-form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Grade (out of {{ submission.assignment.total_marks }})</label>
+                        <input type="number" name="grade" class="grade-input" value="{{ submission.grade }}" 
+                               min="0" max="{{ submission.assignment.total_marks }}" step="1" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Feedback / Comments</label>
+                        <textarea name="feedback" class="feedback-input" rows="3" placeholder="Provide feedback to the student...">{{ submission.feedback }}</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn-submit-grade">
+                    <i class="fas fa-save"></i> Submit Grade
+                </button>
+                <a href="{% url 'staff_submissions' %}" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Back to Submissions
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        padding: 15px 20px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .info-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .info-section h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .info-item:last-child {
+        border-bottom: none;
+    }
+    
+    .info-label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .info-value {
+        color: #3498db;
+        font-weight: 500;
+    }
+    
+    .submission-section {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 15px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .submission-section h6 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .submission-content {
+        padding: 10px;
+    }
+    
+    .btn-download {
+        display: inline-block;
+        padding: 5px 12px;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 12px;
+    }
+    
+    .submission-text {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 1px solid #e0e0e0;
+        margin-top: 10px;
+    }
+    
+    .grade-form {
+        margin-top: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .grade-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .grade-input:focus {
+        border-color: #27ae60;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39,174,96,0.1);
+    }
+    
+    .feedback-input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: vertical;
+        transition: all 0.3s;
+    }
+    
+    .feedback-input:focus {
+        border-color: #f39c12;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(243,156,18,0.1);
+    }
+    
+    .btn-submit-grade {
+        display: inline-block;
+        padding: 10px 25px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 500;
+        margin-right: 10px;
+    }
+    
+    .btn-submit-grade:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    @media (max-width: 768px) {
+        .info-item {
+            flex-direction: column;
+            gap: 5px;
+        }
+    }
+</style>
+{% endblock %}

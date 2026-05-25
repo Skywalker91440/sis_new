@@ -1,0 +1,263 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}View Attendance - {{ subject.code }}{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-chart-line"></i> Attendance Records - {{ subject.code }}: {{ subject.name }}</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search student...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student ID</th>
+                        <th>Student Name</th>
+                        <th>Total Days</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>Attendance %</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for stat in student_stats %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="student-id">{{ stat.student.student.student_id }}</td>
+                        <td class="student-name">{{ stat.student.student.user.get_full_name|default:stat.student.student.user.username }}</td>
+                        <td class="text-center">{{ stat.total }}</td>
+                        <td class="text-center present-count">{{ stat.present }}</td>
+                        <td class="text-center absent-count">{{ stat.absent }}</td>
+                        <td class="text-center">
+                            <div class="progress-container">
+                                <div class="progress-bar 
+                                    {% if stat.percent >= 75 %}progress-success
+                                    {% elif stat.percent >= 50 %}progress-warning
+                                    {% else %}progress-danger{% endif %}" 
+                                    style="width: {{ stat.percent }}%">
+                                </div>
+                                <span class="percent-text">{{ stat.percent }}%</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <p>No attendance records found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+             </table
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'staff_my_courses' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to My Courses
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .present-count {
+        font-weight: bold;
+        color: #27ae60;
+    }
+    
+    .absent-count {
+        font-weight: bold;
+        color: #e74c3c;
+    }
+    
+    .progress-container {
+        position: relative;
+        width: 100%;
+        background: #e0e0e0;
+        border-radius: 10px;
+        overflow: hidden;
+        height: 30px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .progress-success {
+        background: linear-gradient(90deg, #27ae60, #2ecc71);
+    }
+    
+    .progress-warning {
+        background: linear-gradient(90deg, #f39c12, #f1c40f);
+    }
+    
+    .progress-danger {
+        background: linear-gradient(90deg, #e74c3c, #c0392b);
+    }
+    
+    .percent-text {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+        text-shadow: 0 0 2px black;
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+        }
+        .progress-container {
+            height: 25px;
+        }
+        .percent-text {
+            font-size: 10px;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#attendanceTable tbody tr');
+        
+        rows.forEach(row => {
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            const id = row.cells[1]?.textContent.toLowerCase() || '';
+            
+            if (name.includes(searchValue) || id.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

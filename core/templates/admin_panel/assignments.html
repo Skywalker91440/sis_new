@@ -1,0 +1,84 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Manage Assignments{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h5><i class="fas fa-plus-circle"></i> Create New Assignment</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label>Select Course</label>
+                        <select name="subject" class="form-control" required>
+                            <option value="">-- Select Course --</option>
+                            {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.code }} - {{ subject.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Assignment Title</label>
+                        <input type="text" name="title" class="form-control" required placeholder="e.g., Quiz 1, Midterm Exam">
+                    </div>
+                    <div class="mb-3">
+                        <label>Due Date</label>
+                        <input type="date" name="due_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label>Total Marks</label>
+                        <input type="number" name="total_marks" class="form-control" value="100" required>
+                        <small class="text-muted">Maximum marks for this assignment</small>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Create Assignment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-list"></i> All Assignments</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Course</th>
+                                <th>Title</th>
+                                <th>Due Date</th>
+                                <th>Total Marks</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for assignment in assignments %}
+                            <tr>
+                                <td>{{ assignment.subject.code }} - {{ assignment.subject.name }}</td>
+                                <td>{{ assignment.title }}</td>
+                                <td>{{ assignment.due_date|date:"Y-m-d" }}</td>
+                                <td>{{ assignment.total_marks }}</td>
+                                <td>
+                                    <a href="{% url 'staff_edit_assignment' assignment.id %}" class="btn btn-sm btn-warning">Edit</a>
+                                    <a href="{% url 'staff_delete_assignment' assignment.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Delete this assignment?')">Delete</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No assignments created yet</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,262 @@
+{% extends 'base_dashboard.html' %}
+
+{% block title %}My Marks{% endblock %}
+
+{% block dashboard_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-chart-line"></i> My Marks</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search subject...">
+        </div>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="data-table" id="marksTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject Code</th>
+                        <th>Subject Name</th>
+                        <th>Credits</th>
+                        <th>Grade (%)</th>
+                        <th>Grade Letter</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects_with_marks %}
+                    <tr>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="subject-code">{{ subject.code }}</td>
+                        <td class="subject-name">{{ subject.name }}</td>
+                        <td class="text-center">{{ subject.credits }}</td>
+                        <td class="text-center">
+                            {% if subject.grade > 0 %}
+                                <span class="grade-value">{{ subject.grade }}%</span>
+                            {% else %}
+                                <span class="grade-pending">Not Graded</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if subject.grade >= 80 %}
+                                <span class="grade-letter-a">A</span>
+                            {% elif subject.grade >= 70 %}
+                                <span class="grade-letter-b">B</span>
+                            {% elif subject.grade >= 60 %}
+                                <span class="grade-letter-c">C</span>
+                            {% elif subject.grade >= 50 %}
+                                <span class="grade-letter-d">D</span>
+                            {% elif subject.grade > 0 %}
+                                <span class="grade-letter-f">F</span>
+                            {% else %}
+                                <span class="grade-letter-none">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if subject.grade >= 50 %}
+                                <span class="status-pass">✓ Pass</span>
+                            {% elif subject.grade > 0 %}
+                                <span class="status-fail">✗ Fail</span>
+                            {% else %}
+                                <span class="status-pending">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-chart-line"></i>
+                                <p>No marks available</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .subject-code {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .subject-name {
+        font-weight: 500;
+        color: #2c3e50;
+    }
+    
+    .grade-value {
+        font-weight: 600;
+        color: #27ae60;
+    }
+    
+    .grade-pending {
+        color: #f39c12;
+        font-style: italic;
+    }
+    
+    .grade-letter-a, .grade-letter-b, .grade-letter-c, .grade-letter-d, .grade-letter-f, .grade-letter-none {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+    
+    .grade-letter-a { background: #27ae60; color: white; }
+    .grade-letter-b { background: #3498db; color: white; }
+    .grade-letter-c { background: #f39c12; color: white; }
+    .grade-letter-d { background: #e67e22; color: white; }
+    .grade-letter-f { background: #e74c3c; color: white; }
+    .grade-letter-none { background: #95a5a6; color: white; }
+    
+    .status-pass { color: #27ae60; font-weight: bold; }
+    .status-fail { color: #e74c3c; font-weight: bold; }
+    .status-pending { color: #f39c12; font-weight: bold; }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 8px;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#marksTable tbody tr');
+        
+        rows.forEach(row => {
+            const code = row.cells[1]?.textContent.toLowerCase() || '';
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            
+            if (code.includes(searchValue) || name.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

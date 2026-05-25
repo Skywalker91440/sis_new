@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Upcoming Events{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Upcoming Events</h2>
+    {% for e in events %}
+    <div class="event-card">
+        <div style="font-size: 30px;">{{ e.title|slice:":2" }}</div>
+        <div><strong>{{ e.title }}</strong><br>{{ e.date }} | {{ e.location }}</div>
+    </div>
+    {% endfor %}
+    <a href="/dashboard/" class="btn" style="margin-top: 20px;">Back to Dashboard</a>
+</div>
+{% endblock %}

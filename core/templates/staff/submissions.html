@@ -1,0 +1,367 @@
+{% extends 'base_staff_dashboard.html' %}
+
+{% block title %}Student Submissions{% endblock %}
+
+{% block staff_content %}
+<div class="card">
+    <div class="card-header">
+        <h5><i class="fas fa-paper-plane"></i> Student Assignment Submissions</h5>
+        <div class="search-box">
+            <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search student...">
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- Course Selection -->
+        <div class="course-selector">
+            <label><i class="fas fa-book"></i> Select Course:</label>
+            <select id="courseSelect" class="course-select">
+                <option value="">-- All Courses --</option>
+                {% for subject in subjects %}
+                <option value="{{ subject.id }}" {% if selected_subject.id == subject.id %}selected{% endif %}>
+                    {{ subject.code }} - {{ subject.name }}
+                </option>
+                {% endfor %}
+            </select>
+            <button class="btn-filter" onclick="filterByCourse()">
+                <i class="fas fa-filter"></i> Filter
+            </button>
+        </div>
+        
+        <!-- Submissions Table -->
+        <div class="table-responsive mt-4">
+            <table class="data-table" id="submissionsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student Name</th>
+                        <th>Student ID</th>
+                        <th>Assignment</th>
+                        <th>Submitted Date</th>
+                        <th>File</th>
+                        <th>Status</th>
+                        <th>Grade</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for submission in submissions %}
+                    <tr class="submission-row" data-subject="{{ submission.assignment.subject.id }}">
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="student-name">{{ submission.student.user.get_full_name|default:submission.student.user.username }}</td>
+                        <td class="student-id">{{ submission.student.student_id }}</td>
+                        <td class="assignment-title">{{ submission.assignment.title }}</td>
+                        <td class="submitted-date">{{ submission.submitted_at|date:"M d, Y H:i" }}</td>
+                        <td class="text-center">
+                            {% if submission.file %}
+                                <a href="{{ submission.file.url }}" class="btn-view-file" target="_blank">
+                                    <i class="fas fa-file-pdf"></i> View
+                                </a>
+                            {% elif submission.image %}
+                                <a href="{{ submission.image.url }}" class="btn-view-file" target="_blank">
+                                    <i class="fas fa-image"></i> View
+                                </a>
+                            {% else %}
+                                <span class="text-muted">No file</span>
+                            {% endif %}
+                            </td>
+                        <td class="text-center">
+                            {% if submission.status == 'Graded' %}
+                                <span class="badge-graded"><i class="fas fa-check-circle"></i> Graded</span>
+                            {% else %}
+                                <span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            {% if submission.grade %}
+                                <span class="grade-value">{{ submission.grade }}/{{ submission.assignment.total_marks }}</span>
+                            {% else %}
+                                <span class="grade-pending">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-center">
+                            <a href="{% url 'grade_submission' submission.id %}" class="btn-grade">
+                                <i class="fas fa-star"></i> Grade
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="9" class="text-center">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>No submissions found</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+             </table
+        </div>
+        
+        <div class="mt-4">
+            <a href="{% url 'staff_dashboard' %}" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        color: white;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+    }
+    
+    .course-selector {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .course-selector label {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .course-select {
+        padding: 8px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 14px;
+        min-width: 250px;
+    }
+    
+    .btn-filter {
+        padding: 8px 20px;
+        background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(52,152,219,0.3);
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+        font-size: 12px;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .student-id {
+        font-weight: 500;
+        color: #3498db;
+    }
+    
+    .assignment-title {
+        font-weight: 500;
+    }
+    
+    .submitted-date {
+        font-size: 11px;
+        color: #7f8c8d;
+    }
+    
+    .btn-view-file {
+        display: inline-block;
+        padding: 4px 10px;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 11px;
+    }
+    
+    .badge-graded, .badge-pending {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+    }
+    
+    .badge-graded {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .grade-value {
+        font-weight: bold;
+        color: #27ae60;
+    }
+    
+    .grade-pending {
+        color: #95a5a6;
+    }
+    
+    .btn-grade {
+        display: inline-block;
+        padding: 5px 12px;
+        background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 11px;
+        transition: all 0.3s;
+    }
+    
+    .btn-grade:hover {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(243,156,18,0.3);
+    }
+    
+    .btn-back {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #95a5a6;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        transition: all 0.3s;
+    }
+    
+    .btn-back:hover {
+        background: #7f8c8d;
+        transform: translateY(-2px);
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+        }
+        .search-box {
+            width: 100%;
+        }
+        .course-selector {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .course-select {
+            width: 100%;
+        }
+        .data-table {
+            font-size: 11px;
+        }
+        .data-table th, .data-table td {
+            padding: 6px;
+        }
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#submissionsTable tbody tr');
+        
+        rows.forEach(row => {
+            const studentName = row.cells[1]?.textContent.toLowerCase() || '';
+            const studentId = row.cells[2]?.textContent.toLowerCase() || '';
+            const assignment = row.cells[3]?.textContent.toLowerCase() || '';
+            
+            if (studentName.includes(searchValue) || studentId.includes(searchValue) || assignment.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+    
+    // Filter by course
+    function filterByCourse() {
+        const courseId = document.getElementById('courseSelect').value;
+        if (courseId) {
+            window.location.href = "{% url 'staff_submissions' %}?subject_id=" + courseId;
+        } else {
+            window.location.href = "{% url 'staff_submissions' %}";
+        }
+    }
+</script>
+{% endblock %}

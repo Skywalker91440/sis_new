@@ -1,0 +1,162 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Student Details - {{ student.username }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="student-avatar">
+                    <div class="avatar-placeholder">
+                        <i class="fas fa-user-graduate fa-4x"></i>
+                    </div>
+                </div>
+                <h4>{{ student.get_full_name|default:student.username }}</h4>
+                <p class="text-muted">Student</p>
+                <p><span class="badge bg-info">ID: {{ profile.student_id }}</span></p>
+                <hr>
+                <p><i class="fas fa-envelope"></i> {{ student.email }}</p>
+                <p><i class="fas fa-phone"></i> {{ student.profile.phone|default:"Not provided" }}</p>
+                <p><i class="fas fa-calendar"></i> Joined: {{ student.date_joined|date:"F d, Y" }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5><i class="fas fa-edit"></i> Edit Student Information</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label>Phone Number</label>
+                            <input type="tel" name="phone" class="form-control" value="{{ student.profile.phone|default:'' }}">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label>Department</label>
+                            <select name="department" class="form-control">
+                                <option value="Computer Science" {% if profile.department == 'Computer Science' %}selected{% endif %}>Computer Science</option>
+                                <option value="Information Technology" {% if profile.department == 'Information Technology' %}selected{% endif %}>Information Technology</option>
+                                <option value="Engineering" {% if profile.department == 'Engineering' %}selected{% endif %}>Engineering</option>
+                                <option value="Business" {% if profile.department == 'Business' %}selected{% endif %}>Business</option>
+                            </select>
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label>Year of Study</label>
+                            <select name="year" class="form-control">
+                                <option value="1st Year" {% if profile.year == '1st Year' %}selected{% endif %}>1st Year</option>
+                                <option value="2nd Year" {% if profile.year == '2nd Year' %}selected{% endif %}>2nd Year</option>
+                                <option value="3rd Year" {% if profile.year == '3rd Year' %}selected{% endif %}>3rd Year</option>
+                                <option value="4th Year" {% if profile.year == '4th Year' %}selected{% endif %}>4th Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Update Information
+                    </button>
+                    <a href="{% url 'admin_students' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Students List
+                    </a>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-info text-white">
+                <h5><i class="fas fa-book"></i> Enrolled Subjects</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Course Name</th>
+                                <th>Credits</th>
+                                <th>Grade</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for enrollment in enrollments %}
+                            <tr>
+                                <td>{{ enrollment.subject.code }}</td>
+                                <td>{{ enrollment.subject.name }}</td>
+                                <td>{{ enrollment.subject.credits }}</td>
+                                <td>{{ enrollment.grade }}%</td>
+                                <td><span class="badge bg-success">{{ enrollment.status }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center">No subjects enrolled</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <a href="{% url 'admin_add_subject_to_student' student.id %}" class="btn btn-sm btn-success mt-2">
+                    <i class="fas fa-plus"></i> Add Subject
+                </a>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-warning">
+                <h5><i class="fas fa-money-bill"></i> Fee Records</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Fee Type</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for fee in fees %}
+                            <tr>
+                                <td>{{ fee.fee_type }}</td>
+                                <td>TZS {{ fee.amount|floatformat:0 }}</td>
+                                <td>{{ fee.due_date }}</td>
+                                <td><span class="badge {% if fee.status == 'Paid' %}bg-success{% else %}bg-warning{% endif %}">{{ fee.status }}</span></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center">No fee records</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .student-avatar {
+        margin-bottom: 20px;
+    }
+    .avatar-placeholder {
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        color: white;
+    }
+    .badge {
+        font-size: 12px;
+    }
+</style>
+{% endblock %}

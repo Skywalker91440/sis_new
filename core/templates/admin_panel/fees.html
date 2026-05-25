@@ -1,0 +1,330 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Manage Fees{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Fee Form - Left Side -->
+    <div class="col-md-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <h5><i class="fas fa-plus-circle"></i> Add Fee for Student</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-user-graduate"></i> Select Student</label>
+                        <select name="student" class="form-control" required>
+                            <option value="">-- Select Student --</option>
+                            {% for s in students %}
+                            <option value="{{ s.id }}">{{ s.user.get_full_name|default:s.user.username }} ({{ s.student_id }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-tag"></i> Fee Type</label>
+                        <select name="fee_type" class="form-control" required>
+                            <option value="Tuition">Tuition Fee</option>
+                            <option value="Library">Library Fee</option>
+                            <option value="Sports">Sports Fee</option>
+                            <option value="Development">Development Fee</option>
+                            <option value="Exam">Exam Fee</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-money-bill-wave"></i> Amount (TZS)</label>
+                        <input type="number" name="amount" class="form-control" placeholder="Enter amount" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-calendar-alt"></i> Due Date</label>
+                        <input type="date" name="due_date" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-save"></i> Add Fee Record
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Fee Records Table - Right Side -->
+    <div class="col-md-7">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5><i class="fas fa-list"></i> All Fee Records</h5>
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search student...">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="fee-table" id="feeTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Student</th>
+                                <th>Student ID</th>
+                                <th>Fee Type</th>
+                                <th>Amount</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for f in fees %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="student-name">{{ f.student.user.get_full_name|default:f.student.user.username }}</td>
+                                <td class="student-id">{{ f.student.student_id }}</td>
+                                <td>{{ f.fee_type }}</td>
+                                <td class="amount">TZS {{ f.amount|floatformat:0 }}</td>
+                                <td>{{ f.due_date|date:"M d, Y" }}</td>
+                                <td class="text-center">
+                                    {% if f.status == 'Paid' %}
+                                        <span class="badge-paid"><i class="fas fa-check-circle"></i> Paid</span>
+                                    {% else %}
+                                        <span class="badge-pending"><i class="fas fa-clock"></i> Pending</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No fee records found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Cards */
+    .form-card, .table-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        font-size: 18px;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    /* Form Styles */
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 13px;
+    }
+    
+    .form-group label i {
+        margin-right: 8px;
+        color: #3498db;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #3498db;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+    }
+    
+    select.form-control {
+        cursor: pointer;
+    }
+    
+    .btn-add {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+    }
+    
+    /* Search Box */
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+    
+    .search-box .form-control::placeholder {
+        color: rgba(255,255,255,0.7);
+    }
+    
+    .search-box .form-control:focus {
+        background: white;
+        color: #2c3e50;
+    }
+    
+    /* Table Styles */
+    .fee-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .fee-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .fee-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s;
+    }
+    
+    .fee-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .fee-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .student-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .student-id {
+        color: #7f8c8d;
+        font-size: 12px;
+    }
+    
+    .amount {
+        font-weight: 600;
+        color: #27ae60;
+    }
+    
+    /* Badges */
+    .badge-paid {
+        background: #d4edda;
+        color: #155724;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        display: inline-block;
+    }
+    
+    .badge-pending {
+        background: #fff3cd;
+        color: #856404;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        display: inline-block;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+        margin-bottom: 15px;
+    }
+    
+    .empty-state p {
+        color: #7f8c8d;
+        font-size: 14px;
+    }
+    
+    .text-center {
+        text-align: center;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .search-box {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const table = document.getElementById('feeTable');
+        const rows = table.getElementsByTagName('tr');
+        
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const studentName = row.cells[1]?.textContent.toLowerCase() || '';
+            const studentId = row.cells[2]?.textContent.toLowerCase() || '';
+            
+            if (studentName.includes(searchValue) || studentId.includes(searchValue)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        }
+    });
+</script>
+{% endblock %}

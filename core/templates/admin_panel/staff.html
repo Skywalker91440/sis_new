@@ -1,0 +1,349 @@
+{% extends 'admin_panel/base_admin.html' %}
+
+{% block page_title %}Manage Staff{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Add Staff Form - Left Side -->
+    <div class="col-md-5">
+        <div class="card form-card">
+            <div class="card-header">
+                <h5><i class="fas fa-user-plus"></i> Add New Staff</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-user"></i> Username</label>
+                        <input type="text" name="username" class="form-control" placeholder="Enter username" required>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" name="email" class="form-control" placeholder="staff@example.com" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label><i class="fas fa-user"></i> First Name</label>
+                                <input type="text" name="first_name" class="form-control" placeholder="First name">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label><i class="fas fa-user"></i> Last Name</label>
+                                <input type="text" name="last_name" class="form-control" placeholder="Last name">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-phone"></i> Phone Number</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="Phone number">
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label><i class="fas fa-building"></i> Department</label>
+                                <select name="department" class="form-control">
+                                    <option value="Computer Science">Computer Science</option>
+                                    <option value="Information Technology">Information Technology</option>
+                                    <option value="Engineering">Engineering</option>
+                                    <option value="Business">Business</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label><i class="fas fa-briefcase"></i> Position</label>
+                                <select name="position" class="form-control">
+                                    <option value="Senior Lecturer">Senior Lecturer</option>
+                                    <option value="Lecturer">Lecturer</option>
+                                    <option value="Assistant Lecturer">Assistant Lecturer</option>
+                                    <option value="Professor">Professor</option>
+                                    <option value="Teacher">Teacher</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label><i class="fas fa-key"></i> Password</label>
+                        <input type="text" name="password" class="form-control" value="staff123" required>
+                        <small class="text-muted">Default: staff123</small>
+                    </div>
+                    <button type="submit" class="btn-add">
+                        <i class="fas fa-save"></i> Add Staff
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Staff List - Right Side -->
+    <div class="col-md-7">
+        <div class="card table-card">
+            <div class="card-header">
+                <h5><i class="fas fa-chalkboard-user"></i> All Staff Members</h5>
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Search staff...">
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="data-table" id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Staff ID</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Department</th>
+                                <th>Position</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for staff in staff_users %}
+                            <tr>
+                                <td class="text-center">{{ forloop.counter }}</td>
+                                <td class="staff-id">{{ staff.staff_id }}</td>
+                                <td class="staff-name">{{ staff.full_name }}</td>
+                                <td>{{ staff.email }}</td>
+                                <td>{{ staff.department }}</td>
+                                <td>{{ staff.position }}</td>
+                                <td class="text-center">
+                                    <a href="{% url 'admin_staff_detail' staff.id %}" class="btn-view">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <button class="btn-reset" data-bs-toggle="modal" data-bs-target="#resetModal{{ staff.id }}">
+                                        <i class="fas fa-key"></i> Reset
+                                    </button>
+                                    <button class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ staff.id }}">
+                                        <i class="fas fa-trash"></i> Delete
+                                    </button>
+                                </td>
+                             </tr>
+                             
+                             <!-- Reset Password Modal -->
+                             <div class="modal fade" id="resetModal{{ staff.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="staff_id" value="{{ staff.id }}">
+                                            <input type="hidden" name="action" value="reset_password">
+                                            <div class="modal-header">
+                                                <h5>Reset Password - {{ staff.username }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <label>New Password (leave empty for auto-generate)</label>
+                                                <input type="text" name="new_password" class="form-control">
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-warning">Reset Password</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                             </div>
+                             
+                             <!-- Delete Modal -->
+                             <div class="modal fade" id="deleteModal{{ staff.id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="post">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="staff_id" value="{{ staff.id }}">
+                                            <input type="hidden" name="action" value="delete">
+                                            <div class="modal-header">
+                                                <h5>Delete Staff - {{ staff.username }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Are you sure you want to delete <strong>{{ staff.full_name }}</strong>?</p>
+                                                <p class="text-danger">This action cannot be undone!</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                             </div>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox"></i>
+                                        <p>No staff members found</p>
+                                    </div>
+                                </td>
+                             </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-card, .table-card {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        border: none;
+        margin-bottom: 20px;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .card-header h5 {
+        margin: 0;
+        font-size: 18px;
+    }
+    
+    .card-body {
+        padding: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 13px;
+    }
+    
+    .form-group label i {
+        margin-right: 8px;
+        color: #3498db;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+    
+    .btn-add {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    
+    .search-box {
+        width: 250px;
+    }
+    
+    .search-box .form-control {
+        border-radius: 20px;
+        padding: 8px 15px;
+        border: 1px solid rgba(255,255,255,0.3);
+        background: rgba(255,255,255,0.2);
+        color: white;
+    }
+    
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .data-table thead th {
+        background: #f8f9fa;
+        padding: 12px;
+        font-weight: 600;
+        color: #2c3e50;
+        border-bottom: 2px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .data-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .data-table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+    }
+    
+    .staff-id {
+        font-weight: 600;
+        color: #3498db;
+    }
+    
+    .staff-name {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    
+    .btn-view, .btn-reset, .btn-delete {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 2px;
+        border-radius: 5px;
+        font-size: 11px;
+        text-decoration: none;
+        cursor: pointer;
+        border: none;
+    }
+    
+    .btn-view { background: #3498db; color: white; }
+    .btn-reset { background: #f39c12; color: white; }
+    .btn-delete { background: #e74c3c; color: white; }
+    
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+    }
+    
+    .empty-state i {
+        font-size: 60px;
+        color: #bdc3c7;
+    }
+    
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            text-align: center;
+        }
+        .search-box {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        const searchValue = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#staffTable tbody tr');
+        rows.forEach(row => {
+            const name = row.cells[2]?.textContent.toLowerCase() || '';
+            const id = row.cells[1]?.textContent.toLowerCase() || '';
+            row.style.display = (name.includes(searchValue) || id.includes(searchValue)) ? '' : 'none';
+        });
+    });
+</script>
+{% endblock %}
