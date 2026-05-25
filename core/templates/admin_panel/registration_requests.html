@@ -80,6 +80,10 @@
                                     <i class="fas fa-times"></i> Decline
                                 </button>
                             {% endif %}
+                            <!-- Delete button for all statuses -->
+                            <button class="btn-delete" data-bs-toggle="modal" data-bs-target="#deleteModal{{ request.id }}">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
                         </td>
                     </tr>
                     
@@ -175,6 +179,32 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="submit" class="btn btn-danger">Yes, Decline</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal{{ request.id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="post" action="{% url 'admin_delete_registration' request.id %}">
+                                    {% csrf_token %}
+                                    <div class="modal-header bg-dark text-white">
+                                        <h5 class="modal-title">Delete Registration Request</h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete the registration request from <strong>{{ request.first_name }} {{ request.last_name }}</strong>?</p>
+                                        <div class="alert alert-danger">
+                                            <i class="fas fa-exclamation-triangle"></i> 
+                                            <strong>Warning!</strong> This action cannot be undone. The request will be permanently deleted.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="submit" class="btn btn-danger">Yes, Delete</button>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                                     </div>
                                 </form>
@@ -277,11 +307,6 @@
         color: rgba(255,255,255,0.7);
     }
     
-    .search-box .form-control:focus {
-        background: white;
-        color: #2c3e50;
-    }
-    
     /* Data Table */
     .data-table {
         width: 100%;
@@ -350,7 +375,7 @@
     }
     
     /* Buttons */
-    .btn-view, .btn-accept, .btn-decline {
+    .btn-view, .btn-accept, .btn-decline, .btn-delete {
         display: inline-block;
         padding: 5px 12px;
         margin: 2px;
@@ -388,6 +413,16 @@
     
     .btn-decline:hover {
         background: #c0392b;
+        transform: scale(1.02);
+    }
+    
+    .btn-delete {
+        background: #7f8c8d;
+        color: white;
+    }
+    
+    .btn-delete:hover {
+        background: #6c5ce7;
         transform: scale(1.02);
     }
     

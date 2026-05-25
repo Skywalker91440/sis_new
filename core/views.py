@@ -506,11 +506,8 @@ SIS Tanzania Administration
     return render(request, 'forgot_password.html')
 
 
-def logout_view(request):
-    from django.contrib.auth import logout
-    from django.shortcuts import redirect
-    logout(request)
-    return redirect('home')
+
+
 
 def signup_view(request):
     from django.shortcuts import render
@@ -1302,6 +1299,7 @@ def pay_fee(request, fee_id):
     
     return render(request, 'pay_fee.html', {'fee': fee})
 
+
 def student_register(request):
     """Student registration view"""
     from django.shortcuts import render
@@ -1309,12 +1307,18 @@ def student_register(request):
     from .models import RegistrationRequest
     
     if request.method == 'POST':
+        email = request.POST.get('email')
+        
+        # Check if email already exists
+        if RegistrationRequest.objects.filter(email=email).exists():
+            return JsonResponse({'status': 'error', 'message': 'This email is already registered. Please use a different email or contact administration.'})
+        
         try:
             # Create registration request
             registration = RegistrationRequest.objects.create(
                 first_name=request.POST.get('first_name'),
                 last_name=request.POST.get('last_name'),
-                email=request.POST.get('email'),
+                email=email,
                 phone=request.POST.get('phone', ''),
                 date_of_birth=request.POST.get('date_of_birth') or None,
                 course=request.POST.get('course'),
@@ -1330,3 +1334,47 @@ def student_register(request):
             return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
     
     return render(request, 'registration_form.html')
+
+
+def landing_page(request):
+    """Landing page with real statistics from database"""
+    from django.shortcuts import render
+    from .models import StudentProfile, StaffProfile, Subject, Announcement
+    
+    # Get real statistics from database
+    total_students = StudentProfile.objects.count()
+    total_staff = StaffProfile.objects.count()
+    total_courses = Subject.objects.count()
+    
+    # Calculate satisfaction rate (based on active students vs enrolled subjects)
+    # For now, use 98% as default, but you can calculate based on attendance or grades
+    satisfaction_rate = 98
+    
+    # Get latest announcements for landing page
+    latest_announcements = Announcement.objects.all().order_by('-created_date')[:6]
+    
+    context = {
+        'total_students': total_students,
+        'total_staff': total_staff,
+        'total_courses': total_courses,
+        'satisfaction_rate': satisfaction_rate,
+        'announcements': latest_announcements,
+    }
+    return render(request, 'landing.html', context)
+
+
+def about_us(request):
+    """About Us page"""
+    from django.shortcuts import render
+    return render(request, 'about.html')
+
+
+def logout_view(request):
+    """Logout user and redirect to login page"""
+    from django.contrib.auth import logout
+    from django.shortcuts import redirect
+    from django.contrib import messages
+    
+    logout(request)
+    messages.success(request, 'You have been logged out successfully!')
+    return redirect('login')

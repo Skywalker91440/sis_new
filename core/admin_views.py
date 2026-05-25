@@ -781,3 +781,22 @@ SIS Tanzania Administration
         messages.warning(request, f'Registration for {reg_request.first_name} {reg_request.last_name} declined')
     
     return redirect('admin_registration_requests')
+
+@login_required
+@user_passes_test(is_admin, login_url='admin_login')
+def admin_delete_registration(request, request_id):
+    """Delete registration request"""
+    from django.shortcuts import get_object_or_404, redirect
+    from django.contrib import messages
+    from .models import RegistrationRequest
+    
+    reg_request = get_object_or_404(RegistrationRequest, id=request_id)
+    
+    # Store name for message
+    name = f"{reg_request.first_name} {reg_request.last_name}"
+    
+    # Delete the request
+    reg_request.delete()
+    
+    messages.success(request, f'Registration request from {name} has been deleted successfully!')
+    return redirect('admin_registration_requests')

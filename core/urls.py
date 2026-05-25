@@ -4,6 +4,7 @@ from .admin_auth import admin_dashboard_secure
 from . import views
 
 urlpatterns = [
+    path('registration-delete/<int:request_id>/', admin_views.admin_delete_registration, name='admin_delete_registration'),
     path('registration-requests/', admin_views.admin_registration_requests, name='admin_registration_requests'),
     path('registration-process/<int:request_id>/', admin_views.admin_process_registration, name='admin_process_registration'),
     path('change-password/', admin_views.admin_change_password, name='admin_change_password'),

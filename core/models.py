@@ -1,3 +1,4 @@
+from django.core.validators import RegexValidator
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
@@ -15,7 +16,7 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='student')
-    phone = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(max_length=15, blank=True, validators=[RegexValidator(regex=r"^\+?[0-9]{10,15}$", message="Phone number must be between 10-15 digits and can start with +")])
     address = models.TextField(blank=True)
     profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -263,7 +264,7 @@ class RegistrationRequest(models.Model):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     email = models.EmailField(unique=True)
-    phone = models.CharField(max_length=15, blank=True)
+    phone = models.CharField(max_length=15, blank=True, validators=[RegexValidator(regex=r"^\+?[0-9]{10,15}$", message="Phone number must be between 10-15 digits and can start with +")])
     date_of_birth = models.DateField(null=True, blank=True)
     
     # Academic Information

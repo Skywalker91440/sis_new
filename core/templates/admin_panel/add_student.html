@@ -84,3 +84,32 @@
     </div>
 </div>
 {% endblock %}
+
+<script>
+function validatePhoneNumber(phone) {
+    if (!phone) return true;
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+    return phoneRegex.test(cleanPhone);
+}
+
+const phoneInput = document.querySelector('input[name="phone"]');
+if (phoneInput) {
+    phoneInput.addEventListener('input', function() {
+        if (this.value && !validatePhoneNumber(this.value)) {
+            this.style.borderColor = '#e74c3c';
+        } else {
+            this.style.borderColor = '#e0e0e0';
+        }
+    });
+}
+
+document.querySelector('form').addEventListener('submit', function(e) {
+    const phone = phoneInput.value;
+    if (phone && !validatePhoneNumber(phone)) {
+        e.preventDefault();
+        alert('Please enter a valid phone number (10-15 digits, e.g., 0712345678 or +255712345678)');
+        return false;
+    }
+});
+</script>

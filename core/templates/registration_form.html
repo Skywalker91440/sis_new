@@ -6,7 +6,7 @@
 {% block content %}
 <style>
     body {
-        background: url("{% static 'images/images.webp' %}");
+        background: url("{% static 'images/reg1.avif' %}");
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -24,28 +24,22 @@
     .registration-card {
         background: rgba(255,255,255,0.95);
         backdrop-filter: blur(10px);
-        border-radius: 20px;
-        padding: 40px;
-        box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-        max-width: 850px;
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+        max-width: 950px;
         width: 100%;
         animation: fadeIn 0.5s ease;
     }
     
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
     
     .registration-header {
         text-align: center;
-        margin-bottom: 35px;
+        margin-bottom: 40px;
     }
     
     .registration-icon {
@@ -55,33 +49,37 @@
     
     .registration-header h2 {
         color: #2c3e50;
-        font-size: 28px;
-        margin-bottom: 8px;
+        font-size: 32px;
+        margin-bottom: 10px;
+        font-weight: 700;
     }
     
     .registration-header p {
         color: #7f8c8d;
-        font-size: 14px;
+        font-size: 15px;
     }
     
     .form-section {
-        margin-bottom: 30px;
-        padding: 20px;
+        margin-bottom: 35px;
+        padding: 25px;
         background: #f8f9fa;
-        border-radius: 12px;
+        border-radius: 15px;
         transition: all 0.3s;
+        border: 1px solid #e0e0e0;
     }
     
     .form-section:hover {
-        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        border-color: #3498db;
     }
     
     .form-section h4 {
         color: #2c3e50;
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 2px solid #e0e0e0;
-        font-size: 18px;
+        margin-bottom: 25px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #3498db;
+        font-size: 20px;
+        font-weight: 600;
     }
     
     .form-section h4 i {
@@ -94,7 +92,7 @@
         margin-bottom: 8px;
         font-weight: 600;
         color: #2c3e50;
-        font-size: 13px;
+        font-size: 14px;
     }
     
     label i {
@@ -104,11 +102,12 @@
     
     .form-control {
         width: 100%;
-        padding: 10px 12px;
+        padding: 12px 15px;
         border: 2px solid #e0e0e0;
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 14px;
         transition: all 0.3s;
+        background: white;
     }
     
     .form-control:focus {
@@ -117,12 +116,33 @@
         box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
     }
     
+    .form-control.error {
+        border-color: #e74c3c;
+    }
+    
+    .error-message-field {
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+    
+    .alert-error {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin-bottom: 20px;
+    }
+    
     select.form-control {
         cursor: pointer;
     }
     
     textarea.form-control {
         resize: vertical;
+        min-height: 80px;
     }
     
     .text-muted {
@@ -134,26 +154,30 @@
     
     .form-actions {
         text-align: center;
-        margin-top: 30px;
+        margin-top: 35px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
     }
     
     .btn-submit {
         display: inline-block;
-        padding: 12px 30px;
+        padding: 14px 35px;
         background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
         font-size: 16px;
-        font-weight: bold;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s;
-        margin-right: 10px;
+        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
     }
     
     .btn-submit:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(39,174,96,0.3);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(39,174,96,0.4);
     }
     
     .btn-submit:disabled {
@@ -164,22 +188,21 @@
     
     .btn-back {
         display: inline-block;
-        padding: 12px 30px;
+        padding: 14px 35px;
         background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
         color: white;
         text-decoration: none;
-        border-radius: 8px;
+        border-radius: 50px;
         transition: all 0.3s;
-        font-weight: 500;
+        font-weight: 600;
     }
     
     .btn-back:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         color: white;
     }
     
-    /* Modal Styles */
     .modal-overlay {
         display: none;
         position: fixed;
@@ -187,59 +210,55 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0,0,0,0.6);
+        background: rgba(0,0,0,0.7);
         z-index: 10000;
         justify-content: center;
         align-items: center;
-        backdrop-filter: blur(3px);
+        backdrop-filter: blur(5px);
     }
     
     .modal-content-custom {
         background: white;
-        border-radius: 20px;
-        padding: 35px;
+        border-radius: 25px;
+        padding: 40px;
         max-width: 450px;
         text-align: center;
         animation: slideIn 0.3s ease;
+        box-shadow: 0 25px 50px rgba(0,0,0,0.3);
     }
     
     @keyframes slideIn {
-        from {
-            transform: translateY(-50px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+        from { transform: translateY(-50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
     }
     
     .modal-icon {
-        font-size: 70px;
+        font-size: 80px;
         margin-bottom: 15px;
     }
     
     .modal-content-custom h3 {
         color: #27ae60;
         margin-bottom: 15px;
-        font-size: 24px;
+        font-size: 26px;
+        font-weight: 700;
     }
     
     .modal-content-custom p {
         color: #666;
-        margin-bottom: 20px;
+        margin-bottom: 25px;
         line-height: 1.6;
     }
     
     .modal-btn {
-        padding: 10px 30px;
+        padding: 12px 35px;
         background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
         cursor: pointer;
-        font-size: 14px;
-        font-weight: bold;
+        font-size: 15px;
+        font-weight: 600;
         transition: all 0.3s;
     }
     
@@ -250,21 +269,17 @@
     
     @media (max-width: 768px) {
         .registration-card {
-            padding: 25px;
+            padding: 30px 25px;
         }
-        
         .form-section {
-            padding: 15px;
+            padding: 20px 15px;
         }
-        
         .btn-submit, .btn-back {
-            display: block;
             width: 100%;
-            margin: 10px 0;
+            margin: 5px 0;
         }
-        
-        .registration-header h2 {
-            font-size: 24px;
+        .form-actions {
+            flex-direction: column;
         }
     }
 </style>
@@ -277,81 +292,87 @@
             <p>Please fill in all required information to register</p>
         </div>
         
+        <div id="errorMessage" class="alert-error" style="display: none;"></div>
+        
         <form method="post" class="registration-form" id="registrationForm">
             {% csrf_token %}
             
-            <!-- Personal Information -->
             <div class="form-section">
                 <h4><i class="fas fa-user-circle"></i> Personal Information</h4>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-user"></i> First Name *</label>
-                        <input type="text" name="first_name" class="form-control" placeholder="Enter your first name" required>
+                        <input type="text" name="first_name" id="firstName" class="form-control" required>
+                        <div class="error-message-field" id="firstNameError">Please enter a valid first name (letters only)</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-user"></i> Last Name *</label>
-                        <input type="text" name="last_name" class="form-control" placeholder="Enter your last name" required>
+                        <input type="text" name="last_name" id="lastName" class="form-control" required>
+                        <div class="error-message-field" id="lastNameError">Please enter a valid last name (letters only)</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-envelope"></i> Email Address *</label>
-                        <input type="email" name="email" class="form-control" placeholder="you@example.com" required>
+                        <input type="email" name="email" id="emailInput" class="form-control" required>
                         <small class="text-muted">Your login credentials will be sent to this email</small>
+                        <div class="error-message-field" id="emailError">Please enter a valid email address</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-phone"></i> Phone Number</label>
-                        <input type="tel" name="phone" class="form-control" placeholder="+255 xxx xxx xxx">
+                        <input type="tel" name="phone" id="phoneInput" class="form-control" placeholder="0712345678 or +255712345678">
+                        <div class="error-message-field" id="phoneError">Please enter a valid phone number (10-15 digits)</div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label><i class="fas fa-calendar"></i> Date of Birth</label>
-                        <input type="date" name="date_of_birth" class="form-control">
+                        <input type="date" name="date_of_birth" id="dobInput" class="form-control">
+                        <div class="error-message-field" id="dobError">You must be at least 16 years old</div>
                     </div>
                 </div>
             </div>
             
-            <!-- Academic Information -->
             <div class="form-section">
                 <h4><i class="fas fa-graduation-cap"></i> Academic Information</h4>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-book"></i> Select Course *</label>
-                        <select name="course" class="form-control" required>
+                        <select name="course" id="courseSelect" class="form-control" required>
                             <option value="">-- Select Course --</option>
-                            <option value="Computer Science">💻 Computer Science</option>
-                            <option value="Information Technology">🖥️ Information Technology</option>
-                            <option value="Engineering">⚙️ Engineering</option>
-                            <option value="Business">📊 Business</option>
-                            <option value="Mathematics">📐 Mathematics</option>
-                            <option value="Science">🔬 Science</option>
+                            <option value="Computer Science">Computer Science</option>
+                            <option value="Information Technology">Information Technology</option>
+                            <option value="Engineering">Engineering</option>
+                            <option value="Business">Business</option>
+                            <option value="Mathematics">Mathematics</option>
+                            <option value="Science">Science</option>
                         </select>
+                        <div class="error-message-field" id="courseError">Please select a course</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label><i class="fas fa-calendar-alt"></i> Year of Study *</label>
-                        <select name="year" class="form-control" required>
+                        <select name="year" id="yearSelect" class="form-control" required>
                             <option value="">-- Select Year --</option>
                             <option value="1st Year">1st Year</option>
                             <option value="2nd Year">2nd Year</option>
                             <option value="3rd Year">3rd Year</option>
                             <option value="4th Year">4th Year</option>
                         </select>
+                        <div class="error-message-field" id="yearError">Please select year of study</div>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label><i class="fas fa-school"></i> Previous Institution</label>
-                        <input type="text" name="previous_institution" class="form-control" placeholder="Previous school/college">
+                        <input type="text" name="previous_institution" class="form-control">
                     </div>
                 </div>
             </div>
             
-            <!-- Address Information -->
             <div class="form-section">
                 <h4><i class="fas fa-map-marker-alt"></i> Address Information</h4>
                 <div class="row">
                     <div class="col-md-12 mb-3">
                         <label><i class="fas fa-address-card"></i> Address</label>
-                        <textarea name="address" class="form-control" rows="2" placeholder="Your residential address"></textarea>
+                        <textarea name="address" class="form-control" rows="2"></textarea>
                     </div>
                     <div class="col-md-12 mb-3">
                         <label><i class="fas fa-city"></i> City</label>
-                        <input type="text" name="city" class="form-control" placeholder="City/Town">
+                        <input type="text" name="city" class="form-control">
                     </div>
                 </div>
             </div>
@@ -360,7 +381,7 @@
                 <button type="submit" class="btn-submit" id="submitBtn">
                     <i class="fas fa-paper-plane"></i> Submit Registration
                 </button>
-                <a href="{% url 'home' %}" class="btn-back">
+                <a href="{% url 'login' %}" class="btn-back">
                     <i class="fas fa-arrow-left"></i> Back to Home
                 </a>
             </div>
@@ -368,33 +389,223 @@
     </div>
 </div>
 
-<!-- Success Modal -->
 <div id="successModal" class="modal-overlay">
     <div class="modal-content-custom">
         <div class="modal-icon">✅</div>
-        <h3>Registration Submitted!</h3>
-        <p>Thank you for registering with SIS Tanzania!</p>
+        <h3>Registration Submitted Successfully!</h3>
+        <p>Thank you for registering with Starvec University!</p>
         <p>Please check your email regularly to receive your login credentials. You will be notified once your registration is approved by the administration.</p>
         <button class="modal-btn" onclick="window.location.href='/'">OK</button>
     </div>
 </div>
 
 <script>
+    // Validation functions
+    function validateName(name) {
+        return /^[A-Za-z\s]{2,50}$/.test(name);
+    }
+    
+    function validateEmail(email) {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+    
+    function validatePhone(phone) {
+        if (!phone) return true;
+        const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+        return /^\+?[0-9]{10,15}$/.test(cleanPhone);
+    }
+    
+    function validateAge(dob) {
+        if (!dob) return true;
+        const birthDate = new Date(dob);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDiff = today.getMonth() - birthDate.getMonth();
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age >= 16;
+    }
+    
+    // Real-time validation
+    const firstName = document.getElementById('firstName');
+    const lastName = document.getElementById('lastName');
+    const email = document.getElementById('emailInput');
+    const phone = document.getElementById('phoneInput');
+    const dob = document.getElementById('dobInput');
+    const course = document.getElementById('courseSelect');
+    const year = document.getElementById('yearSelect');
+    
+    if (firstName) {
+        firstName.addEventListener('input', function() {
+            if (!validateName(this.value)) {
+                this.classList.add('error');
+                document.getElementById('firstNameError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('firstNameError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (lastName) {
+        lastName.addEventListener('input', function() {
+            if (!validateName(this.value)) {
+                this.classList.add('error');
+                document.getElementById('lastNameError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('lastNameError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (email) {
+        email.addEventListener('input', function() {
+            if (!validateEmail(this.value)) {
+                this.classList.add('error');
+                document.getElementById('emailError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('emailError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (phone) {
+        phone.addEventListener('input', function() {
+            if (!validatePhone(this.value)) {
+                this.classList.add('error');
+                document.getElementById('phoneError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('phoneError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (dob) {
+        dob.addEventListener('change', function() {
+            if (!validateAge(this.value)) {
+                this.classList.add('error');
+                document.getElementById('dobError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('dobError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (course) {
+        course.addEventListener('change', function() {
+            if (!this.value) {
+                this.classList.add('error');
+                document.getElementById('courseError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('courseError').style.display = 'none';
+            }
+        });
+    }
+    
+    if (year) {
+        year.addEventListener('change', function() {
+            if (!this.value) {
+                this.classList.add('error');
+                document.getElementById('yearError').style.display = 'block';
+            } else {
+                this.classList.remove('error');
+                document.getElementById('yearError').style.display = 'none';
+            }
+        });
+    }
+    
+    // Form submission
     document.getElementById('registrationForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
         const submitBtn = document.getElementById('submitBtn');
+        const errorDiv = document.getElementById('errorMessage');
+        
+        // Validate all fields
+        let isValid = true;
+        let errorMsg = '';
+        
+        const firstNameVal = firstName.value;
+        const lastNameVal = lastName.value;
+        const emailVal = email.value;
+        const courseVal = course.value;
+        const yearVal = year.value;
+        const phoneVal = phone.value;
+        const dobVal = dob.value;
+        
+        if (!validateName(firstNameVal)) {
+            isValid = false;
+            errorMsg = 'Please enter a valid first name (letters only, 2-50 characters)';
+            firstName.classList.add('error');
+            document.getElementById('firstNameError').style.display = 'block';
+        }
+        
+        if (!validateName(lastNameVal)) {
+            isValid = false;
+            errorMsg = 'Please enter a valid last name (letters only, 2-50 characters)';
+            lastName.classList.add('error');
+            document.getElementById('lastNameError').style.display = 'block';
+        }
+        
+        if (!validateEmail(emailVal)) {
+            isValid = false;
+            errorMsg = 'Please enter a valid email address';
+            email.classList.add('error');
+            document.getElementById('emailError').style.display = 'block';
+        }
+        
+        if (phoneVal && !validatePhone(phoneVal)) {
+            isValid = false;
+            errorMsg = 'Please enter a valid phone number (10-15 digits)';
+            phone.classList.add('error');
+            document.getElementById('phoneError').style.display = 'block';
+        }
+        
+        if (dobVal && !validateAge(dobVal)) {
+            isValid = false;
+            errorMsg = 'You must be at least 16 years old to register';
+            dob.classList.add('error');
+            document.getElementById('dobError').style.display = 'block';
+        }
+        
+        if (!courseVal) {
+            isValid = false;
+            errorMsg = 'Please select a course';
+            course.classList.add('error');
+            document.getElementById('courseError').style.display = 'block';
+        }
+        
+        if (!yearVal) {
+            isValid = false;
+            errorMsg = 'Please select year of study';
+            year.classList.add('error');
+            document.getElementById('yearError').style.display = 'block';
+        }
+        
+        if (!isValid) {
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + errorMsg;
+            errorDiv.style.display = 'block';
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
+            return;
+        }
+        
         submitBtn.disabled = true;
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        errorDiv.style.display = 'none';
         
         const formData = new FormData(this);
         
         fetch('/register/', {
             method: 'POST',
             body: formData,
-            headers: {
-                'X-CSRFToken': '{{ csrf_token }}',
-            },
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' },
         })
         .then(response => response.json())
         .then(data => {
@@ -402,20 +613,20 @@
                 document.getElementById('successModal').style.display = 'flex';
                 document.getElementById('registrationForm').reset();
             } else {
-                alert('Error: ' + data.message);
+                errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ' + data.message;
+                errorDiv.style.display = 'block';
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            errorDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> An error occurred. Please try again.';
+            errorDiv.style.display = 'block';
             submitBtn.disabled = false;
             submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Submit Registration';
         });
     });
     
-    // Close modal when clicking outside
     document.getElementById('successModal').addEventListener('click', function(e) {
         if (e.target === this) {
             this.style.display = 'none';

@@ -6,6 +6,8 @@ from core import views
 from core.admin_auth import admin_login_view
 
 urlpatterns = [
+    path('home/', views.home, name='home'),
+    path('about/', views.about_us, name='about'),
     path('register/', views.student_register, name='register'),
     path('admin/', admin.site.urls),
     path('admin-login/', admin_login_view, name='admin_login'),
@@ -21,7 +23,7 @@ urlpatterns = [
     path('admin-fees/', views.redirect_to_admin_fees, name='redirect_admin_fees'),
     
     # Main site URLs
-    path('', views.home, name='home'),
+    path('', views.landing_page, name='landing'),
     path('signup/', views.signup_view, name='signup'),
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
