@@ -109,3 +109,5 @@ LOGOUT_REDIRECT_URL = 'home'
 
 # Email settings (for testing, emails will be printed to console)
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+ALLOWED_HOSTS = ['*', '.onrender.com', 'localhost', '127.0.0.1']
